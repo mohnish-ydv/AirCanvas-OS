@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="AirCanvas OS portfolio hero graphic">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06101d"/>
+      <stop offset="0.58" stop-color="#101b36"/>
+      <stop offset="1" stop-color="#281747"/>
+    </linearGradient>
+    <radialGradient id="cyanGlow">
+      <stop offset="0" stop-color="#5ee7f7" stop-opacity=".42"/>
+      <stop offset="1" stop-color="#5ee7f7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="violetGlow">
+      <stop offset="0" stop-color="#a889ff" stop-opacity=".36"/>
+      <stop offset="1" stop-color="#a889ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="22" stdDeviation="26" flood-color="#000" flood-opacity=".5"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" rx="40" fill="url(#bg)"/>
+  <circle cx="1320" cy="130" r="360" fill="url(#cyanGlow)"/>
+  <circle cx="180" cy="800" r="330" fill="url(#violetGlow)"/>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <text x="92" y="105" fill="#5ee7f7" font-size="30" font-weight="700" letter-spacing="3">AIRCANVAS OS / PORTFOLIO EDITION</text>
+    <text x="92" y="210" fill="#f4f8ff" font-size="74" font-weight="800">Create in the air.</text>
+    <text x="92" y="292" fill="#f4f8ff" font-size="74" font-weight="800">Shape ideas instantly.</text>
+    <text x="92" y="350" fill="#a9b7cb" font-size="26">Gesture-native spatial creation • Smart Ink • True 3D</text>
+
+    <g transform="translate(92 395)">
+      <g><rect width="170" height="48" rx="24" fill="#ffffff12" stroke="#5ee7f755"/><text x="85" y="31" text-anchor="middle" fill="#f4f8ff" font-size="16" font-weight="700">ON-DEVICE</text></g>
+      <g transform="translate(185 0)"><rect width="170" height="48" rx="24" fill="#ffffff12" stroke="#5ee7f755"/><text x="85" y="31" text-anchor="middle" fill="#f4f8ff" font-size="16" font-weight="700">SMART INK</text></g>
+      <g transform="translate(370 0)"><rect width="150" height="48" rx="24" fill="#ffffff12" stroke="#5ee7f755"/><text x="75" y="31" text-anchor="middle" fill="#f4f8ff" font-size="16" font-weight="700">TRUE 3D</text></g>
+    </g>
+
+    <g transform="translate(690 95)" filter="url(#shadow)">
+      <rect width="820" height="700" rx="42" fill="#091626" stroke="#5ee7f766" stroke-width="2"/>
+      <text x="42" y="58" fill="#a9b7cb" font-size="19">LIVE SPATIAL WORKSPACE</text>
+
+      <g transform="translate(410 350)">
+        <polygon points="0,-120 112,-58 112,74 0,136 -112,74 -112,-58" fill="#5263c7cc" stroke="#f4f8ff" stroke-width="5"/>
+        <polyline points="0,-120 0,6 112,74" fill="none" stroke="#f4f8ffaa" stroke-width="4"/>
+        <polyline points="0,6 -112,74" fill="none" stroke="#f4f8ffaa" stroke-width="4"/>
+        <text x="0" y="20" text-anchor="middle" fill="#fff" font-size="24" font-weight="800">GESTURE CORE</text>
+      </g>
+
+      <g fill="#102d42" stroke="#5ee7f7" stroke-width="3">
+        <rect x="52" y="145" width="250" height="110" rx="26"/>
+        <rect x="518" y="145" width="250" height="110" rx="26" fill="#4a2f16" stroke="#ffd45e"/>
+        <rect x="52" y="490" width="250" height="110" rx="26"/>
+        <rect x="518" y="490" width="250" height="110" rx="26" fill="#41203e" stroke="#ff8dd8"/>
+      </g>
+      <g fill="#f4f8ff" font-size="21" font-weight="700" text-anchor="middle">
+        <text x="177" y="192">CAMERAX +</text><text x="177" y="220">MEDIAPIPE</text>
+        <text x="643" y="192">SMART INK</text><text x="643" y="220">ROUGH → CLEAN</text>
+        <text x="177" y="548">TRUE 3D</text>
+        <text x="643" y="540">PNG • PDF</text><text x="643" y="568">SVG • JSON</text>
+      </g>
+      <g stroke-width="5" fill="none">
+        <path d="M302 200 L342 258" stroke="#5ee7f7"/>
+        <path d="M518 200 L478 258" stroke="#ffd45e"/>
+        <path d="M302 545 L342 438" stroke="#8bd8ff"/>
+        <path d="M518 545 L478 438" stroke="#ff8dd8"/>
+      </g>
+    </g>
+
+    <text x="92" y="710" fill="#5ee7f7" font-size="22" font-weight="700">DEVELOPER</text>
+    <text x="92" y="765" fill="#f4f8ff" font-size="44" font-weight="800">Mohnish Raj</text>
+    <text x="92" y="805" fill="#8fa3bc" font-size="22">Android • Computer Vision • Spatial Interaction</text>
+  </g>
+</svg>

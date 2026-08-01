@@ -1,0 +1,133 @@
+name: Build verified APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aircanvas-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install required SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Run portable core regressions
+        run: |
+          mkdir -p qa-build
+          javac --release 17 -Xlint:all -Werror -d qa-build \
+            app/src/main/java/com/mohnish/aircanvas/gesture/*.java \
+            app/src/main/java/com/mohnish/aircanvas/model/Bounds.java \
+            app/src/main/java/com/mohnish/aircanvas/model/CanvasElement.java \
+            app/src/main/java/com/mohnish/aircanvas/model/DesignDocument.java \
+            app/src/main/java/com/mohnish/aircanvas/model/InkMode.java \
+            app/src/main/java/com/mohnish/aircanvas/model/ShapeKind.java \
+            app/src/main/java/com/mohnish/aircanvas/model/SpatialMesh.java \
+            app/src/main/java/com/mohnish/aircanvas/model/SpatialSnapEngine.java \
+            app/src/main/java/com/mohnish/aircanvas/model/TemplateFactory.java \
+            app/src/main/java/com/mohnish/aircanvas/model/Tool.java \
+            app/src/main/java/com/mohnish/aircanvas/model/TransformAxis.java \
+            app/src/main/java/com/mohnish/aircanvas/model/StylePreset.java \
+            app/src/main/java/com/mohnish/aircanvas/model/SelectionOperations.java \
+            app/src/main/java/com/mohnish/aircanvas/model/ProjectInsights.java \
+            app/src/main/java/com/mohnish/aircanvas/ink/SmartInkRequest.java \
+            app/src/main/java/com/mohnish/aircanvas/ink/SmartStrokeInterpreter.java \
+            app/src/main/java/com/mohnish/aircanvas/ink/OnDeviceInkRecognizer.java \
+            app/src/main/java/com/mohnish/aircanvas/vision/FrameOrientation.java \
+            app/src/main/java/com/mohnish/aircanvas/vision/AdaptiveFrameGovernor.java \
+            app/src/main/java/com/mohnish/aircanvas/vision/PerformanceTelemetry.java \
+            qa/CoreRegressionHarness.java \
+            qa/CameraOrientationHarness.java \
+            qa/PortfolioEditionHarness.java \
+            qa/RecognitionReliabilityHarness.java \
+            qa/GestureExpansionHarness.java \
+            qa/PerformancePacingHarness.java \
+            qa/LandscapeReadinessHarness.java \
+            qa/PinchRealityHarness.java
+          java -cp qa-build CoreRegressionHarness
+          java -cp qa-build CameraOrientationHarness
+          java -cp qa-build PortfolioEditionHarness
+          java -cp qa-build RecognitionReliabilityHarness
+          java -cp qa-build GestureExpansionHarness
+          java -cp qa-build PerformancePacingHarness
+          java -cp qa-build LandscapeReadinessHarness
+          java -cp qa-build PinchRealityHarness
+
+      - name: Run Auto Text reflection regression
+        run: |
+          mkdir -p qa-ink-build
+          mapfile -t FAKE_MLKIT < <(find qa/fake-mlkit -name '*.java' -print | sort)
+          javac --release 17 -Xlint:all -Werror -d qa-ink-build \
+            "${FAKE_MLKIT[@]}" \
+            app/src/main/java/com/mohnish/aircanvas/model/Bounds.java \
+            app/src/main/java/com/mohnish/aircanvas/ink/SmartInkRequest.java \
+            app/src/main/java/com/mohnish/aircanvas/ink/OnDeviceInkRecognizer.java \
+            qa/AutoTextReflectionHarness.java
+          java -cp qa-ink-build AutoTextReflectionHarness
+          grep -q 'com.google.mlkit.vision.digitalink.recognition.' \
+            app/src/main/java/com/mohnish/aircanvas/ink/OnDeviceInkRecognizer.java
+          grep -q 'getBoolean("landscapeFirst", true)' \
+            app/src/main/java/com/mohnish/aircanvas/settings/AppSettings.java
+
+      - name: Verify and assemble release
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon clean testDebugUnitTest lintRelease assembleRelease
+
+      - name: Audit release APK
+        run: |
+          APK="app/build/outputs/apk/release/app-release.apk"
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/36.0.0"
+          "$BUILD_TOOLS/apksigner" verify --verbose "$APK"
+          "$BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$APK"
+          apkanalyzer manifest permissions "$APK" | tee release-permissions.txt
+          for required in CAMERA INTERNET ACCESS_NETWORK_STATE; do
+            grep -q "android.permission.$required" release-permissions.txt || {
+              echo "Required permission missing: $required"
+              exit 1
+            }
+          done
+          if grep -Eq 'android\.permission\.(RECORD_AUDIO|ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|READ_CONTACTS|WRITE_CONTACTS|READ_SMS|SEND_SMS|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE)' release-permissions.txt; then
+            echo "Unexpected privacy-sensitive permission found"
+            exit 1
+          fi
+
+      - name: Prepare APK artifact
+        run: |
+          mkdir -p release
+          cp app/build/outputs/apk/release/app-release.apk \
+            release/AirCanvas-OS-Codename-v2.3.0-Pinch-Rebuild.apk
+          cp release-permissions.txt release/
+          sha256sum release/AirCanvas-OS-Codename-v2.3.0-Pinch-Rebuild.apk \
+            > release/AirCanvas-OS-Codename-v2.3.0-Pinch-Rebuild.apk.sha256
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AirCanvas-OS-Codename-v2.3.0-Pinch-Rebuild
+          path: release/
+          if-no-files-found: error
+          retention-days: 30

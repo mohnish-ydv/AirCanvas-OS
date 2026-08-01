@@ -1,0 +1,20 @@
+AirCanvas OS v2.3.0 Pinch Rebuild — final portable QA
+Verification date: 2026-08-01
+
+Portable Java 17 compilation: PASS (-Xlint:all -Werror)
+Core regression harness: 5/5 passed
+Camera orientation harness: 5/5 passed
+Portfolio edition regression: 5/5 passed
+Recognition reliability harness: 10/10 passed
+Gesture expansion harness: 3/3 passed
+Performance pacing harness: 3/3 passed
+Landscape readiness harness: 5/5 passed
+Pinch reality harness: 11/11 passed
+Auto Text reflection harness: 8/8 passed
+Android XML / manifest / SVG parse: 12/12 passed
+GitHub Actions YAML parse: 1/1 passed
+Packaged compiled .class scan: PASS (none found)
+Portable gesture/vision total: 47/47 passed
+Auto Text reflection total: 8/8 passed
+
+Android Gradle boundary: not executed locally because services.gradle.org is unreachable in this sandbox; GitHub Actions remains the Android build/lint/APK gate.
